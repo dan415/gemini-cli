@@ -15,6 +15,7 @@ import dns from 'node:dns';
 import { spawn } from 'node:child_process';
 import { start_sandbox } from './utils/sandbox.js';
 import type { DnsResolutionOrder, LoadedSettings } from './config/settings.js';
+import { RELAUNCH_EXIT_CODE } from './utils/processUtils.js';
 import { loadSettings, SettingScope } from './config/settings.js';
 import { themeManager } from './ui/themes/theme-manager.js';
 import { getStartupWarnings } from './utils/startupWarnings.js';
@@ -102,17 +103,28 @@ function getNodeMemoryArgs(config: Config): string[] {
   return [];
 }
 
-async function relaunchWithAdditionalArgs(additionalArgs: string[]) {
-  const nodeArgs = [...additionalArgs, ...process.argv.slice(1)];
-  const newEnv = { ...process.env, GEMINI_CLI_NO_RELAUNCH: 'true' };
+async function relaunchAppInChildProcess(additionalArgs: string[]) {
+  let relaunch = true;
+  while (relaunch) {
+    const nodeArgs = [...additionalArgs, ...process.argv.slice(1)];
+    const newEnv = { ...process.env, GEMINI_CLI_NO_RELAUNCH: 'true' };
 
-  const child = spawn(process.execPath, nodeArgs, {
-    stdio: 'inherit',
-    env: newEnv,
-  });
+    const child = spawn(process.execPath, nodeArgs, {
+      stdio: 'inherit',
+      env: newEnv,
+    });
 
-  await new Promise((resolve) => child.on('close', resolve));
-  process.exit(0);
+    const exitCode = await new Promise<number>((resolve) => {
+      child.on('close', resolve);
+    });
+
+    if (exitCode === RELAUNCH_EXIT_CODE) {
+      relaunch = true;
+    } else {
+      relaunch = false;
+      process.exit(exitCode);
+    }
+  }
 }
 
 import { runZedIntegration } from './zed-integration/zedIntegration.js';
@@ -350,7 +362,7 @@ export async function main() {
       // Not in a sandbox and not entering one, so relaunch with additional
       // arguments to control memory usage if needed.
       if (memoryArgs.length > 0) {
-        await relaunchWithAdditionalArgs(memoryArgs);
+        await relaunchAppInChildProcess(memoryArgs);
         process.exit(0);
       }
     }

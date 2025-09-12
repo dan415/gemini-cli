@@ -92,6 +92,11 @@ import { useSessionStats } from './contexts/SessionContext.js';
 import { useTextBuffer } from './components/shared/text-buffer.js';
 import { useLogger } from './hooks/useLogger.js';
 import { useLoadingIndicator } from './hooks/useLoadingIndicator.js';
+import * as processUtils from '../utils/processUtils.js';
+
+vi.mock('../utils/processUtils.js', () => ({
+  relaunchApp: vi.fn(),
+}));
 
 describe('AppContainer State Management', () => {
   let mockConfig: Config;
@@ -554,6 +559,28 @@ describe('AppContainer State Management', () => {
       // You can even verify that the plumbed function is callable
       capturedUIActions.handleProQuotaChoice('auth');
       expect(mockHandler).toHaveBeenCalledWith('auth');
+    });
+  });
+
+  describe('Relaunch Logic', () => {
+    it('calls relaunchApp when isRestarting is true', () => {
+      const relaunchApp = vi.spyOn(processUtils, 'relaunchApp');
+      mockedUseFolderTrust.mockReturnValue({
+        isFolderTrustDialogOpen: false,
+        handleFolderTrustSelect: vi.fn(),
+        isRestarting: true,
+      });
+
+      render(
+        <AppContainer
+          config={mockConfig}
+          settings={mockSettings}
+          version="1.0.0"
+          initializationResult={mockInitResult}
+        />,
+      );
+
+      expect(relaunchApp).toHaveBeenCalled();
     });
   });
 });
