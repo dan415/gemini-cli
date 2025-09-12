@@ -90,9 +90,6 @@ function isValidContent(content: Content): boolean {
     if (part === undefined || Object.keys(part).length === 0) {
       return false;
     }
-    if (!part.thought && part.text !== undefined && part.text === '') {
-      return false;
-    }
   }
   return true;
 }
@@ -142,6 +139,9 @@ function extractCuratedHistory(comprehensiveHistory: Content[]): Content[] {
       }
       if (isValid) {
         curatedHistory.push(...modelOutput);
+      } else {
+        // Remove the last user input when model content is invalid.
+        curatedHistory.pop();
       }
     }
   }
