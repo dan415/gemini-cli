@@ -104,8 +104,7 @@ function getNodeMemoryArgs(config: Config): string[] {
 }
 
 async function relaunchAppInChildProcess(additionalArgs: string[]) {
-  let relaunch = true;
-  while (relaunch) {
+  while (true) {
     const nodeArgs = [...additionalArgs, ...process.argv.slice(1)];
     const newEnv = { ...process.env, GEMINI_CLI_NO_RELAUNCH: 'true' };
 
@@ -114,15 +113,18 @@ async function relaunchAppInChildProcess(additionalArgs: string[]) {
       env: newEnv,
     });
 
-    const exitCode = await new Promise<number>((resolve) => {
-      child.on('close', resolve);
-    });
+    try {
+      const exitCode = await new Promise<number>((resolve, reject) => {
+        child.on('error', reject);
+        child.on('close', (code) => resolve(code ?? 1));
+      });
 
-    if (exitCode === RELAUNCH_EXIT_CODE) {
-      relaunch = true;
-    } else {
-      relaunch = false;
-      process.exit(exitCode);
+      if (exitCode !== RELAUNCH_EXIT_CODE) {
+        process.exit(exitCode);
+      }
+    } catch (error) {
+      console.error('Fatal error: Failed to relaunch the CLI process.', error);
+      process.exit(1);
     }
   }
 }
@@ -363,7 +365,7 @@ export async function main() {
       // arguments to control memory usage if needed.
       if (memoryArgs.length > 0) {
         await relaunchAppInChildProcess(memoryArgs);
-        process.exit(0);
+        // Note: relaunchAppInChildProcess never returns, so this line is unreachable
       }
     }
   }
