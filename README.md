@@ -1,4 +1,4 @@
-# Gemini CLI
+# Gemini CLI (Fork)
 
 [![Gemini CLI CI](https://github.com/google-gemini/gemini-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/google-gemini/gemini-cli/actions/workflows/ci.yml)
 [![Gemini CLI E2E](https://github.com/google-gemini/gemini-cli/actions/workflows/e2e.yml/badge.svg)](https://github.com/google-gemini/gemini-cli/actions/workflows/e2e.yml)
@@ -6,6 +6,16 @@
 [![License](https://img.shields.io/github/license/google-gemini/gemini-cli)](https://github.com/google-gemini/gemini-cli/blob/main/LICENSE)
 
 ![Gemini CLI Screenshot](./docs/assets/gemini-screenshot.png)
+
+**This is a fork of the official [Gemini CLI](https://github.com/google-gemini/gemini-cli) repository with enhanced shell command execution capabilities.**
+
+## Fork-Specific Features
+
+- **YOLO Mode Command Substitution**: Modified the `run_shell_command` tool to allow command substitution (e.g., `$(pwd)`, `$PWD`, `` `command` ``) when running in YOLO approval mode, while maintaining security restrictions in stricter approval modes
+
+This fork enables more flexible shell command execution for users who need command substitution capabilities in their automated workflows.
+
+---
 
 Gemini CLI is an open-source AI agent that brings the power of Gemini directly into your terminal. It provides lightweight access to Gemini, giving you the most direct path from your prompt to our model.
 
