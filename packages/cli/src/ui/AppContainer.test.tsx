@@ -93,10 +93,6 @@ import { useTextBuffer } from './components/shared/text-buffer.js';
 import { useLogger } from './hooks/useLogger.js';
 import { useLoadingIndicator } from './hooks/useLoadingIndicator.js';
 
-vi.mock('../utils/processUtils.js', () => ({
-  relaunchApp: vi.fn(),
-}));
-
 describe('AppContainer State Management', () => {
   let mockConfig: Config;
   let mockSettings: LoadedSettings;
