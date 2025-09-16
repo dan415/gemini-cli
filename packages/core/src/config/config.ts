@@ -105,6 +105,7 @@ export interface TelemetrySettings {
   otlpProtocol?: 'grpc' | 'http';
   logPrompts?: boolean;
   outfile?: string;
+  useCollector?: boolean;
 }
 
 export interface OutputSettings {
@@ -706,6 +707,10 @@ export class Config {
 
   getTelemetryOutfile(): string | undefined {
     return this.telemetrySettings.outfile;
+  }
+
+  getTelemetryUseCollector(): boolean {
+    return this.telemetrySettings.useCollector ?? false;
   }
 
   getGeminiClient(): GeminiClient {
