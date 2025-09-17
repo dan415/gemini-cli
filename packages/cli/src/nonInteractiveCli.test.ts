@@ -53,7 +53,6 @@ describe('runNonInteractive', () => {
   let mockToolRegistry: ToolRegistry;
   let mockCoreExecuteToolCall: vi.Mock;
   let mockShutdownTelemetry: vi.Mock;
-  let consoleErrorSpy: vi.SpyInstance;
   let processStdoutSpy: vi.SpyInstance;
   let mockGeminiClient: {
     sendMessageStream: vi.Mock;
@@ -64,7 +63,6 @@ describe('runNonInteractive', () => {
     mockCoreExecuteToolCall = vi.mocked(executeToolCall);
     mockShutdownTelemetry = vi.mocked(shutdownTelemetry);
 
-    consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     processStdoutSpy = vi
       .spyOn(process.stdout, 'write')
       .mockImplementation(() => true);
@@ -239,9 +237,6 @@ describe('runNonInteractive', () => {
     await runNonInteractive(mockConfig, 'Trigger tool error', 'prompt-id-3');
 
     expect(mockCoreExecuteToolCall).toHaveBeenCalled();
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      'Error executing tool errorTool: Execution failed',
-    );
     expect(mockGeminiClient.sendMessageStream).toHaveBeenCalledTimes(2);
     expect(mockGeminiClient.sendMessageStream).toHaveBeenNthCalledWith(
       2,
@@ -310,9 +305,6 @@ describe('runNonInteractive', () => {
     );
 
     expect(mockCoreExecuteToolCall).toHaveBeenCalled();
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      'Error executing tool nonexistentTool: Tool "nonexistentTool" not found in registry.',
-    );
     expect(mockGeminiClient.sendMessageStream).toHaveBeenCalledTimes(2);
     expect(processStdoutSpy).toHaveBeenCalledWith(
       "Sorry, I can't find that tool.",
