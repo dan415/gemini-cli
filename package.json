@@ -1,6 +1,6 @@
 {
-  "name": "@google/gemini-cli",
-  "version": "0.6.0-nightly",
+  "name": "@dan415/gemini-cli",
+  "version": "1.1.0",
   "engines": {
     "node": ">=20.0.0"
   },
@@ -8,10 +8,9 @@
   "workspaces": [
     "packages/*"
   ],
-  "private": "true",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/google-gemini/gemini-cli.git"
+    "url": "git+https://github.com/dan415/gemini-cli.git"
   },
   "config": {
     "sandboxImageUri": "us-docker.pkg.dev/gemini-code-dev/gemini-cli/sandbox:0.6.0-nightly"
